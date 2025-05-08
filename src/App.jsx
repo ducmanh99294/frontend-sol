@@ -3,6 +3,7 @@ import ConnectWallet from "./components/ConnectWallet";
 import UploadFile from "./components/UploadFile";
 import VerifyDocument from "./components/VerifyDocument";
 import Web3 from 'web3';
+const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 function App() {
   const [account, setAccount] = useState("");
@@ -14,7 +15,7 @@ function App() {
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
-        const response = await fetch("https://backend-sol.onrender.com/api/documents");
+        const response = await fetch(`${backendURL}/api/documents`);
         const docs = await response.json();
         setAllDocs(docs);
         // Khởi tạo Web3 instance

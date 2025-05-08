@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Web3 from "web3";
+const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 function UploadFile({ onUploadSuccess }) {
   const [file, setFile] = useState(null);
@@ -18,7 +19,7 @@ function UploadFile({ onUploadSuccess }) {
     setIsUploading(true);
 
     try {
-      const response = await fetch("https://backend-sol.onrender.com/api/documents/upload", {
+      const response = await fetch(`${backendURL}/api/documents/upload`, {
         method: "POST",
         body: formData,
       });
