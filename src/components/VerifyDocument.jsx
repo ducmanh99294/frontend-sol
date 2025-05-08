@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Web3 from "web3";
 import contractABI from "../abi/Contract.json";
 
-const contractAddress = "0x64095674d65a4ec44ec3f1f1dee02e35bd2f6db7";
+const contractAddress = "0x84ab68a9113286e4fe5835006344862bae379e19";
 
 function VerifyDocument({ userDocs }) {
   const [selectedInput, setSelectedInput] = useState(""); // CID hoặc Hash
