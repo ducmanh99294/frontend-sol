@@ -12,6 +12,17 @@ function App() {
   const [allDocs, setAllDocs] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null); // cho modal
 
+  const refetchAllDocs = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/documents`);
+      const data = await res.json();
+      setAllDocs(data);
+      console.log("✅ Đã cập nhật danh sách tài liệu:", data);
+    } catch (err) {
+      console.error("❌ Lỗi khi lấy tài liệu:", err);
+    }
+  };
+
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
@@ -55,7 +66,8 @@ function App() {
   // Nếu là tài liệu của người dùng hiện tại
   setUserDocs((prev) => [...prev, docInfo]);
 
-  // TODO: Gọi smart contract hoặc backend để lưu
+  // Cập nhật danh sách tài liệu
+  refetchAllDocs(); 
   };
 
   return (
