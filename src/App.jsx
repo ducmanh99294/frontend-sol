@@ -14,7 +14,7 @@ function App() {
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/documents");
+        const response = await fetch("https://backend-sol.onrender.com/api/documents");
         const docs = await response.json();
         setAllDocs(docs);
         // Khởi tạo Web3 instance
