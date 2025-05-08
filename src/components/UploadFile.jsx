@@ -24,38 +24,41 @@ function UploadFile({ onUploadSuccess }) {
     setIsUploading(true);
 
     try {
-      // 📤 Gửi file tới backend để upload IPFS
-      const response = await fetch(`${backendURL}/api/documents/upload`, {
+      // 📤 Gửi file đến backend (chỉ upload IPFS)
+      const res = await fetch(`${backendURL}/api/documents/upload`, {
         method: "POST",
         body: formData,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert("❌ Upload thất bại: " + (data.error || "Unknown error"));
-        return;
+      const data = await res.json();
+      if (!res.ok || !data.cid) {
+        throw new Error(data.error || "Không nhận được CID");
       }
 
       const cid = data.cid;
-      const hash = data.hash;
+      const hash = Web3.utils.keccak256(cid);
       setCID(cid);
+
       console.log("📦 CID:", cid);
       console.log("🔑 Hash:", hash);
 
-      // 🧠 Kết nối MetaMask
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      // 🧠 Kiểm tra nếu CID đã tồn tại
+      const exists = await contract.methods.verifyDocument(hash).call();
+      if (exists) {
+        alert("⚠️ CID đã tồn tại trên blockchain. Không cần lưu lại.");
+        return;
+      }
 
-      // 📜 Gọi storeCID từ frontend (người dùng xác nhận)
+      // 👛 Kết nối MetaMask và gọi storeCID
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
       await contract.methods.storeCID(cid).send({ from: accounts[0] });
 
       // ✅ Thành công
       onUploadSuccess(file, cid, hash);
-      alert("✅ CID đã được lưu trên blockchain!");
-
+      alert("✅ CID đã được lưu lên blockchain!");
     } catch (err) {
-      console.error("❌ Upload hoặc blockchain error:", err);
-      alert("❌ Lỗi khi tải lên hoặc lưu CID.");
+      console.error("❌ Upload hoặc lưu lỗi:", err);
+      alert("❌ Lỗi khi tải lên hoặc lưu CID. Kiểm tra console.");
     } finally {
       setIsUploading(false);
     }
@@ -66,7 +69,7 @@ function UploadFile({ onUploadSuccess }) {
       <input type="file" onChange={handleFileChange} />
       <button
         onClick={uploadToIPFS}
-        className="bg-green-500 text-white px-4 py-2 ml-2 rounded"
+        className="bg-blue-600 text-white px-4 py-2 ml-2 rounded"
         disabled={isUploading}
       >
         {isUploading ? "Đang xử lý..." : "Tải lên & xác nhận"}
